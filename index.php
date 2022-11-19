@@ -73,9 +73,9 @@
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <div class="navbar-nav ms-auto p-4 p-lg-0">
                     <a href="index.php" class="nav-item nav-link active">Home</a>
-                    <a href="about.php" class="nav-item nav-link">Account</a>
+                    <a href="#" class="nav-item nav-link">Account</a>
                     <a href="product/product.php" class="nav-item nav-link">Products</a>
-                    <a href="contact.html" class="nav-item nav-link">Contact Us</a>
+                    <a href="#" class="nav-item nav-link">Contact Us</a>
                     <a href="login/login.php" class="nav-item nav-link">Signin</a>
                     <a href="login/logout.php" class="nav-item nav-link">Logout</a>
                 </div>
