@@ -1,326 +1,229 @@
 <?php
-	include("connectdb.php");
-    $sql = "SELECT * FROM tb_type_product";
-    $result_tb_type_product = mysqli_query($conn, $sql);
-	$count = mysqli_num_rows($result_tb_type_product);
-	$order = 1;
-?>
-<?php
-	$sql = "SELECT *,tb_type_product.title as type_title FROM tb_product LEFT JOIN tb_type_product ON tb_product.type_product_id = tb_type_product.id";
-	$result = mysqli_query($conn, $sql);
-	$count = mysqli_num_rows($result);
-	$order = 1;
+include("connectdb.php");
+
+//จำนวนรายได้ทั้งหมด
+$sql_total = "SELECT SUM(s_price) as all_total FROM bookings";
+$query_total = mysqli_query($conn,$sql_total);
+$result_total = mysqli_fetch_assoc($query_total);
+
+//จำนวนลูกค้าทั้งหมด
+$sql_c  = "SELECT COUNT(username) as all_cus FROM customer";
+$query_c  = mysqli_query($conn,$sql_c );
+$result_c  = mysqli_fetch_assoc($query_c );
+
+//จำนวนบริการทั้งหมด
+$sql_ser = "SELECT COUNT(s_id) as all_ser FROM service1";
+$query_ser = mysqli_query($conn,$sql_ser);
+$result_ser = mysqli_fetch_assoc($query_ser);
+
+//กราฟแสดงรายได้ต่อเดือน
+$sql = "SELECT * FROM bookings";
+$query = mysqli_query($conn,$sql);
+$label = array();
+foreach($query as $key => $value){
+	$label[] = $value['s_price'];
+}
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en"> 
 <head>
-    <meta charset="utf-8">
     <title>ร้านขายยาใกล้บ้าน</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="" name="keywords">
-    <meta content="" name="description">
+    
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="description" content="ร้านขายยาใกล้บ้าน">
+    <meta name="author" content="Xiaoying Riley at 3rd Wave Media">    
+    <link rel="shortcut icon" href="favicon.ico"> 
+    
+    <!-- FontAwesome JS-->
+    <script defer src="assets/assets/plugins/fontawesome/js/all.min.js"></script>
+    
+    <!-- App CSS -->  
+    <link id="theme-style" rel="stylesheet" href="assets/assets/css/portal.css">
 
-    <!-- Favicon -->
-    <link href="../stores/img/favicon.ico" rel="icon">
+</head> 
 
-    <!-- Google Web Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500&family=Lora:wght@600;700&display=swap" rel="stylesheet"> 
+<body class="app">   	
+    <header class="app-header fixed-top">	   	            
+        <div class="app-header-inner">  
+	        <div class="container-fluid py-2">
+		        <div class="app-header-content"> 
+		            <div class="row justify-content-between align-items-center">
+			        
+				    <div class="col-auto ">
+					    <a id="sidepanel-toggler" class="sidepanel-toggler d-inline-block d-xl-none" href="#">
+						    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" role="img"><title>Menu</title><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg>
+					    </a>
+				    </div><!--//col-->
+		            
+		            <div class="app-utilities col-auto">
+			            <div class="app-utility-item app-notifications-dropdown dropdown">    
+			            <div class="app-utility-item app-user-dropdown dropdown">
+				            <a class="dropdown-toggle" id="user-dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false"><img src="assets/assets/images/admin.png" alt="user profile"></a>
+				            <ul class="dropdown-menu" aria-labelledby="user-dropdown-toggle">
+								<li><a class="dropdown-item" href="account.php">Account</a></li>
+								<li><hr class="dropdown-divider"></li>
+								<li><a class="dropdown-item" href="login.php">Log Out</a></li>
+							</ul>
+			            </div><!--//app-user-dropdown--> 
+		            	</div><!--//app-utilities-->
+		        	</div><!--//row-->
 
-    <!-- Icon Font Stylesheet -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+	            </div><!--//app-header-content-->
+	        </div><!--//container-fluid-->
+        </div><!--//app-header-inner-->
+        <div id="app-sidepanel" class="app-sidepanel"> 
+	        <div id="sidepanel-drop" class="sidepanel-drop"></div>
+	        <div class="sidepanel-inner d-flex flex-column">
+		        <a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
+		        <div class="app-branding">
+		            <a class="app-logo" href="index.php"><img class="logo-icon me-2" src="assets/assets/images/heart.png" alt="logo">
+					<span class="logo-text">Pharmacy</span></a>
+		        </div><!--//app-branding-->  
+		        
+			    <nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
+				    <ul class="app-menu list-unstyled accordion" id="menu-accordion">
+					    <li class="nav-item">
+					        <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+					        <a class="nav-link active" href="index.php">
+						        <span class="nav-icon">
+									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-house-door" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd" d="M7.646 1.146a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 .146.354v7a.5.5 0 0 1-.5.5H9.5a.5.5 0 0 1-.5-.5v-4H7v4a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .146-.354l6-6zM2.5 7.707V14H6v-4a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4h3.5V7.707L8 2.207l-5.5 5.5z"/>
+										<path fill-rule="evenodd" d="M13 2.5V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+									</svg>
+						        </span>
+		                        <span class="nav-link-text">หน้าหลัก</span>
+					        </a><!--//nav-link-->
+					    </li><!--//nav-item-->
 
-    <!-- Libraries Stylesheet -->
-    <link href="../stores/lib/animate/animate.min.css" rel="stylesheet">
-    <link href="../stores/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+					    <li class="nav-item">
+					        <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+					        <a class="nav-link" href="admin/admin.php">
+								<span class="nav-icon">
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+										<path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+									</svg>
+						         </span>
+		                         <span class="nav-link-text">ข้อมูลพนักงาน</span>
+					        </a><!--//nav-link-->
+					    </li><!--//nav-item-->
 
-    <!-- Customized Bootstrap Stylesheet -->
-    <link href="../stores/css/bootstrap.min.css" rel="stylesheet">
+					    <li class="nav-item">
+					        <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+					        <a class="nav-link" href="product/product.php">
+						        <span class="nav-icon">
+						        	<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-card-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+										<path fill-rule="evenodd" d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8zm0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z"/>
+										<circle cx="3.5" cy="5.5" r=".5"/>
+										<circle cx="3.5" cy="8" r=".5"/>
+										<circle cx="3.5" cy="10.5" r=".5"/>
+									</svg>
+						         </span>
+		                         <span class="nav-link-text">ข้อมูลสินค้า</span>
+					        </a><!--//nav-link-->
+					    </li><!--//nav-item-->
 
-    <!-- Template Stylesheet -->
-    <link href="../stores/css/style.css" rel="stylesheet">
-</head>
-<style>
-    body {
-	 
-	  font-family: Kanit;
-   
-	  }
-</style>
-<body>
-    <!-- Spinner Start -->
-    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-        <div class="spinner-border text-primary" role="status"></div>
-    </div>
-    <!-- Spinner End -->
+						<li class="nav-item">
+					        <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+					        <a class="nav-link" href="typeproduct/typeproduct.php">
+						        <span class="nav-icon">
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bag-heart" viewBox="0 0 16 16">
+										<path fill-rule="evenodd" d="M10.5 3.5a2.5 2.5 0 0 0-5 0V4h5v-.5Zm1 0V4H15v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V4h3.5v-.5a3.5 3.5 0 1 1 7 0ZM14 14V5H2v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1ZM8 7.993c1.664-1.711 5.825 1.283 0 5.132-5.825-3.85-1.664-6.843 0-5.132Z"/>
+									  </svg>
+									</svg>
+						         </span>
+		                         <span class="nav-link-text">จัดการข้อมูลประเภทสินค้า</span>
+					        </a><!--//nav-link-->
+					    </li><!--//nav-item-->
 
+						<li class="nav-item">
+					        <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+					        <a class="nav-link" href="customer/customer.php">
+						        <span class="nav-icon">
+									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-columns-gap" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd" d="M6 1H1v3h5V1zM1 0a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1H1zm14 12h-5v3h5v-3zm-5-1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5zM6 8H1v7h5V8zM1 7a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1H1zm14-6h-5v7h5V1zm-5-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1h-5z"/>
+									  </svg>
+						         </span>
+								 
+		                         <span class="nav-link-text">ข้อมูลลูกค้า</span>
+					        </a><!--//nav-link-->
+					    </li><!--//nav-item-->
 
-    <!-- Navbar Start -->
-    <div class="container-fluid fixed-top px-0 wow fadeIn" data-wow-delay="0.1s">
-        <div class="top-bar row gx-0 align-items-center d-none d-lg-flex">
-            <div class="col-lg-6 px-5 text-start">
-                <small><i class="fa fa-map-marker-alt me-2"></i>123 ขามเรียง, กันทรวิชัย, มหาสารคาม</small>
-                <small class="ms-4"><i class="fa fa-envelope me-2"></i>pharmacy@gmail.com</small>
-            </div>
-            
-        </div>
+		                        
+					    <li class="nav-item">
+					        <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+					        <a class="nav-link" href="order/order.php">
+								<span class="nav-icon">
+						       		<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-card-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-basket" viewBox="0 0 16 16">
+										<path d="M5.757 1.071a.5.5 0 0 1 .172.686L3.383 6h9.234L10.07 1.757a.5.5 0 1 1 .858-.514L13.783 6H15a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1v4.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 13.5V9a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h1.217L5.07 1.243a.5.5 0 0 1 .686-.172zM2 9v4.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V9H2zM1 7v1h14V7H1zm3 3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 4 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 6 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 8 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5z"/>
+									</svg>
+						         </span>
+		                         <span class="nav-link-text">คำสั่งซื้อ</span>
+					        </a><!--//nav-link-->
+					    </li><!--//nav-item-->	
 
-        <nav class="navbar navbar-expand-lg navbar-light py-lg-0 px-lg-5 wow fadeIn" data-wow-delay="0.1s">
-            <a href="index.php" class="navbar-brand ms-4 ms-lg-0">
-                <h1 class="text-danger" >Pharmacy</h1>
-            </a>
-            <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarCollapse">
-                <div class="navbar-nav ms-auto p-4 p-lg-0">
-                    <li class="scroll-to-section"><a href="index.php" class="nav-item nav-link active">Home</a></li>
-                    <li class="scroll-to-section"><a href="customer/signup.php" class="nav-item nav-link">Account</a></li>
-                    <li class="scroll-to-section"><a href="product.php" class="nav-item nav-link">Products</a></li>
-                    <li class="scroll-to-section"><a href="#Contact" class="nav-item nav-link">Contact Us</a></li>
-                    <a href="customer/signup.php" class="nav-item nav-link">SIGNUP</a>
-                    <a href="customer/login.php" class="nav-item nav-link">LOGIN</a>
-                </div>
-                    </div><!--//app-user-dropdown--> 
-                </div>
-            </div>
-        </nav>
-    </div>
-    <!-- Navbar End -->
+						<li class="nav-item">
+					        <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+					        <a class="nav-link" href="list/list.php">
+								<span class="nav-icon">
+						        	<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-files" fill="currentColor" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">
+										<path d="M4.5 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1ZM6 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>
+										<path d="M12 1a2 2 0 0 1 2 2 2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h10ZM2 12V5a2 2 0 0 1 2-2h9a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1Zm1-4v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8H3Zm12-1V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v2h12Z"/>
+									</svg>
+						         </span>
+		                         <span class="nav-link-text">รายงานการขาย</span>
+					        </a><!--//nav-link-->
+					    </li><!--//nav-item-->
+				    
+				    </ul><!--//app-menu-->
+			    </nav><!--//app-nav-->
+			    <div class="app-sidepanel-footer">
+				    <nav class="app-nav app-nav-footer">
+					    <ul class="app-menu footer-menu list-unstyled">
+						    <li class="nav-item">
+						        <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+						        <a class="nav-link" href="../index.php">
+							        <span class="nav-icon">
+							            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">
+											<path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0v2z"/>
+											<path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
+										  </svg>
+							        </span>
+			                        <span class="nav-link-text">ออกจากระบบ</span>
+						        </a><!--//nav-link-->
+						    </li><!--//nav-item-->
 
-<br>
-<br>
-<br>
-<br>
-<br>
+					    </ul><!--//footer-menu-->
+				    </nav>
+			    </div><!--//app-sidepanel-footer-->
+		       
+	        </div><!--//sidepanel-inner-->
+	    </div><!--//app-sidepanel-->
+    </header><!--//app-header-->
+    
+    <div class="app-wrapper">
+	    
+	    <div class="app-content pt-3 p-md-3 p-lg-4">
+		    <div class="container-xl">
+			    <h1 class="app-page-title">Home</h1>
+			    <img src="assets/assets/images/pharmacy.png" class="rounded float-end" alt="...">
+			</div><!--//container-fluid-->
+		</div><!--//app-content-->			
+	</div><!--//app-wrapper-->    					
+					
+    
+    <!-- Javascript -->          
+    <script src="assets/assets/plugins/popper.min.js"></script>
+    <script src="assets/assets/plugins/bootstrap/js/bootstrap.min.js"></script>  
+	
+    <!-- Page Specific JS -->
+    <script src="assets/assets/js/app.js"></script> 
 
-    <!-- Carousel Start -->
-    <div class="container-fluid p-0 mb-5 wow fadeIn" data-wow-delay="0.1s">
-        <div id="header-carousel" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <img src="../stores/img/pharmacy.png" class="rounded float-end" alt="Image">
-                    <div class="carousel-caption">
-                        <div class="container">
-                            <div class="row justify-content-start">
-                                <div class="col-lg-7">
-                                    <h1 class="text-gray-700 display-2 mb-5 animated slideInDown">ร้านขายยาใกล้บ้าน</h1>
-                                    <h1 class="fs-4 animated slideInDown">New Experience. Health-Care Delivery All The Time.</h1>
-                                    <h1  class="fs-6">ร้านที่คุณเลือกได้ทุกที่ทุกเวลา เลือกสิ่งที่คุณต้องการจากร้านขายยาของเราได้ทันที</h1>
-                                    <a href="#Product" class="btn btn-danger rounded-pill py-sm-3 px-sm-5">View more</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Carousel End -->
-
-
-    <!-- Product Start -->
-    <section id="Product">
-    <div class="container-xxl py-6">
-        <div class="container">
-            <div class="row g-0 gx-5 align-items-end">
-                <div class="col-lg-6">
-                    <div class="section-header text-start mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
-                        <h1 class="display-5 mb-3">Our Popular Categories</h1>
-                        <p>ชุดยาที่ใช้รักษา บรรเทา หรือป้องกันอาการบาดเจ็บหรือความเจ็บป่วยในเบื้องต้น.</p>
-                    </div>
-                </div>
-                <div class="col-lg-6 text-start text-lg-end wow slideInRight" data-wow-delay="0.1s">
-                    <ul class="nav nav-pills d-inline-flex justify-content-end mb-5">
-                        
-                    <?php foreach($result_tb_type_product as $data):?>
-                        <li class="nav-item me-2">
-                            <a class="btn btn-outline-primary" href="product.php?type_product_id=<?=$data['id']?>"><?=$data['title'];?></a>
-                        </li>
-                        <?php endforeach;?>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="tab-content">
-                <div id="tab-1" class="tab-pane fade show p-0 active">
-                    <div class="row g-4">
-                    
-                    <?php foreach($result as $data):?>
-                        
-                        <div class="col-xl-3 col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                            <div class="product-item"> 
-                                <div class="position-relative bg-light overflow-hidden">
-                                    <img class="rounded mx-auto d-block w-50" src="admin/product/upload_product/<?=$data['image'];?>">
-                                </div>
-                                <div class="text-center p-4">
-                                    <a class="d-block h5 mb-2"><?=$data['med_name'];?></a>
-                                    <p class="text-dark mb-2">ประเภท : <?=$data['type_title'];?></p>
-                                    <span class="text-primary me-1">ราคา : <?=$data['med_cost'];?> บาท</span>
-                                </div>
-                                <div class="d-flex border-top">
-                                <small class="w-50 text-center border-end py-2">
-                                         <a class="text-body" href=""><i class="fa fa-eye text-primary me-2"></i>View detail</a> 
-                                    </small>
-                                    <small class="w-50 text-center py-2">
-                                        <!-- <a class="text-body" href=""><i class="fa fa-shopping-bag text-primary me-2"></i>Add to cart</a>
-                                        Button trigger modal -->
-                                        <a class="text-body" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                        <i class="fa fa-shopping-bag text-primary me-2"></i>Add to cart</a>
-
-                                        <!-- Modal -->
-                                        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLabel">กรุณาเข้าสู่ระบบ</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                ...
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-primary" href="signup.php">เข้าสู่ระบบ</button>
-                                            </div>
-                                            </div>
-                                        </div>
-                                        </div>
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                       
-                    <?php endforeach;?>
-                    
-                    </div>
-                </div>
-            </div>
-            <br>
-            <br>
-                        <div class="col-12 text-center">
-                            <a href="product.php" class="btn btn-danger rounded-pill py-sm-3 px-sm-5">Browse More Products</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-
-    <!-- Product End -->
-
-
-    <!-- Firm Visit Start -->
-    <div class="container-fluid bg-danger bg-icon mt-5 py-6">
-        <div class="container">
-        <img src="../stores/img/pills.png" class="rounded float-start" alt="Image">
-            <div class="row g-5 align-items-center">
-                <div class="col-md-7 wow fadeIn" data-wow-delay="0.1s">
-                    <h1 class="display-5 text-white mb-3">Don't miss out on your promotion.</h1>
-                    <p class="text-white mb-0">ลงทะเบียนตอนนี้เพื่อรับส่วนลดของคุณทุกที่ทุกเวลา ง่าย รวดเร็ว และเข้าถึงได้สำหรับทุกคนทุกวัย.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Firm Visit End -->
-
-<br>
-<br>
-<br>
-<br>
-<br><img src="../stores/img/dy1.png" class="rounded float-start" alt="Image">
-<br>
-<br>
-
-    <!-- Testimonial Start -->
-    <div class="container-fluid bg-light py-6 mb-5">
-        <div class="container">
-            <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
-                <h1 class="display-5 mb-3">Delivery<span class="text-danger">within 45 minutes</span></h1>
-                <p>หากสินค้าของคุณใช้เวลามากกว่า 45 นาที เรารับผิดชอบเอง เราภูมิใจที่จะบอกว่าเราดำเนินการจัดส่งอย่างจริงจัง เพื่อให้คุณไม่ต้องกังวลว่าอาหารจะมาถึงคุณอย่างไรหรือเมื่อไหร่</p>
-            </div>
-        </div> 
-    </div>
-    <!-- Testimonial End -->
-
-
-<!-- Footer Start -->
-<section id="Contact">
-    <div class="container-fluid bg-dark footer mt-5 pt-5 wow fadeIn" data-wow-delay="0.1s">
-        <div class="container py-5">
-            <div class="row g-5">
-                <div class="col-lg-3 col-md-6">
-                    <h1 class="text-danger">Pharmacy</h1>
-                    <p>New Experience. Health-Care Delivery All The Time. ร้านที่คุณเลือกได้ทุกที่ทุกเวลา เลือกสิ่งที่คุณต้องการจากร้านขายยาของเราได้ทันที</p>
-                    <div class="d-flex pt-2">
-                        <a class="btn btn-square btn-outline-light rounded-circle me-1" href=""><i class="fab fa-twitter"></i></a>
-                        <a class="btn btn-square btn-outline-light rounded-circle me-1" href=""><i class="fab fa-facebook-f"></i></a>
-                        <a class="btn btn-square btn-outline-light rounded-circle me-1" href=""><i class="fab fa-youtube"></i></a>
-                        <a class="btn btn-square btn-outline-light rounded-circle me-0" href=""><i class="fab fa-linkedin-in"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-light mb-4">Address</h4>
-                    <p><i class="fa fa-map-marker-alt me-3"></i>123 ขามเรียง, กันทรวิชัย, มหาสารคาม,</p>
-                    <p><i class="fa fa-phone-alt me-3"></i>0966916592</p>
-                    <p><i class="fa fa-envelope me-3"></i>pharmacy@gmail.com</p>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-light mb-4">Quick Links</h4>
-                    <a class="btn btn-link" href="">About Us</a>
-                    <a class="btn btn-link" href="">Contact Us</a>
-                    <a class="btn btn-link" href="">Our Services</a>
-                    <a class="btn btn-link" href="">Terms & Condition</a>
-                    <a class="btn btn-link" href="">Support</a>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-light mb-4">Newsletter</h4>
-                    <p>Dolor amet sit justo amet elitr clita ipsum elitr est.</p>
-                    <div class="position-relative mx-auto" style="max-width: 400px;">
-                        <input class="form-control bg-transparent w-100 py-3 ps-4 pe-5" type="text" placeholder="Your email">
-                        <button type="button" class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2">SignUp</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="container-fluid copyright">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                        &copy; <a href="#">Your Site Name</a>, All Right Reserved.
-                    </div>
-                    <div class="col-md-6 text-center text-md-end">
-                        <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
-                        Designed By <a href="https://htmlcodex.com">HTML Codex</a>
-                        <br>Distributed By: <a href="https://themewagon.com" target="_blank">ThemeWagon</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    </section>
-    <!-- Footer End -->
-
-
-    <!-- Back to Top -->
-    <a href="#" class="btn btn-lg btn-primary btn-lg-square rounded-circle back-to-top"><i class="bi bi-arrow-up"></i></a>
-
-
-    <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../stores/lib/wow/wow.min.js"></script>
-    <script src="../stores/lib/easing/easing.min.js"></script>
-    <script src="../stores/lib/waypoints/waypoints.min.js"></script>
-    <script src="../stores/lib/owlcarousel/owl.carousel.min.js"></script>
-
-    <!-- Template Javascript -->
-    <script src="../stores/js/main.js"></script>
 </body>
-</html>
+</html> 
+
